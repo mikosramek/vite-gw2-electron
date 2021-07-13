@@ -1,0 +1,16 @@
+body,
+#app {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  font-family: arial;
+}
+
+.global {
+  &__wrapper {
+    width: calc(100% - 50px);
+    margin: 0 0 0 50px;
+  }
+}
