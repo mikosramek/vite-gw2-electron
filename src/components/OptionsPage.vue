@@ -1,47 +1,63 @@
 <template>
   <div class="OptionsPage">
-    <h2 class="OptionsPage__heading">
-      OptionsPage
-    </h2>
-    <form @submit.prevent>
-      <div
-        v-for="(input, index) of inputs"
-        :key="index"
-        class="OptionsPage__input-container"
+    <TitleBar
+      label="Options"
+      icon-type="gear"
+    />
+    <div class="global__wrapper">
+      <form
+        class="OptionsPage__form"
+        @submit.prevent
       >
-        <label
-          :for="input.id"
-          class="OptionsPage__input-label"
-        >{{ input.label }}</label>
-        <input
-          :id="input.id"
-          v-model="input.inputValue.value"
-          v-bind="input.inputBinds"
-          :class="input.classes"
+        <div
+          v-for="(input, index) of inputs"
+          :key="index"
+          :class="input.containerClasses"
         >
-      </div>
-      <button
-        type="reset"
-        :disabled="isSaving"
-        @click="closeOptions"
-      >
-        Cancel
-      </button>
-      <button
-        type="submit"
-        :disabled="isSaving"
-        @click="saveOptions"
-      >
-        Confirm
-      </button>
-    </form>
+          <label
+            :for="input.id"
+            class="OptionsPage__input-label"
+          >{{ input.label }}</label>
+          <div class="OptionsPage__input-entry-wrapper">
+            <input
+              :id="input.id"
+              v-model="input.inputValue.value"
+              v-bind="input.inputBinds"
+              :class="input.classes"
+            >
+            <GenericButton
+              v-if="input.showToggle"
+              :on-click="() => { changeInputType(input.id) }"
+              label="👁"
+            />
+          </div>
+        </div>
+        <div class="OptionsPage__input-button-container">
+          <GenericButton
+            label="Cancel"
+            :on-click="closeOptions"
+            :disabled="isSaving"
+            class="OptionsPage__input-button"
+          />
+          <GenericButton
+            label="Confirm"
+            :on-click="saveOptions"
+            :disabled="isSaving"
+            class="OptionsPage__input-button"
+          />
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
 <script>
   import { mapGetters } from 'vuex';
+  import GenericButton from './Generic/GenericButton.vue';
+  import TitleBar from './Generic/TitleBar.vue';
   export default {
-    name : 'OptionsPage',
+    name       : 'OptionsPage',
+    components : { TitleBar, GenericButton },
     data() {
       return {
         isSaving    : false,
@@ -49,8 +65,9 @@
           apiKey : {
             label      : 'API Key',
             value      : '',
+            showToggle : true,
             inputBinds : {
-              type : 'text'
+              type : 'password'
             }
           },
           updateRate : {
@@ -79,13 +96,15 @@
       inputs() {
         return Object.entries(this.inputValues)
             .map(([key, value]) => {
-              const { label, value : inputValue, inputBinds } = value;
+              const { label, value : inputValue, inputBinds, showToggle } = value;
               return {
-                id         : key,
-                inputValue : this.inputValues[key],
+                id               : key,
+                inputValue       : this.inputValues[key],
                 label,
                 inputBinds,
-                classes    : ['OptionsPage__input-entry', `OptionsPage__input-entry--${inputBinds.type}`]
+                showToggle,
+                containerClasses : [ 'OptionsPage__input-container', `OptionsPage__input-container--${inputBinds.type}` ],
+                classes          : ['OptionsPage__input-entry', `OptionsPage__input-entry--${inputBinds.type}`]
               };
             });
       },
@@ -116,6 +135,15 @@
       },
       closeOptions() {
         window.api.sendMessage('closeOptions');
+      },
+      changeInputType(key) {
+        const binds = this.inputValues[key].inputBinds;
+        if (binds.type === 'password') {
+          binds.type = 'text';
+        }
+        else {
+          binds.type = 'password';
+        }
       }
     }
   };
@@ -124,19 +152,61 @@
 <style lang='scss'>
   .OptionsPage {
     position: relative;
-    &__heading {
-      margin-top: 0;
+    height: 100%;
+    &__form {
+      padding: 15px;
+      background: rgba(#251d1b, 0.8);
+      margin-top: -5px;
     }
     &__input {
       &-container {
         display: flex;
+        flex-direction: column;
+        margin-bottom: 5px;
+        &--number {
+          flex-direction: row;
+          .OptionsPage__input-label {
+            width: 65%;
+          }
+        }
+        &--password,
+        &--text {
+          .OptionsPage__input-entry-wrapper {
+            width: 100%;
+            display: flex;
+          }
+          .OptionsPage__input-entry {
+            flex-grow: 1;
+            margin-right: 5px;
+          }
+        }
       }
       &-label {
-        margin-right: 10px;
-        width: 50%;
+        color: #fcebcf;
+        font-size: 14px;
+        margin-bottom: 5px;
+        flex-grow: 1;
+      }
+      &-entry-wrapper {
+        width: 20%;
       }
       &-entry {
-        width: 50%;
+        width: 100%;
+        &--number {
+          width: calc(100% - 8px);
+        }
+      }
+      &-button-container {
+        margin-top: 15px;
+        display: flex;
+        justify-content: flex-end;
+        margin-right: 0;
+      }
+      &-button {
+        margin-right: 10px;
+        &:last-of-type {
+          margin-right: 0;
+        }
       }
     }
   }

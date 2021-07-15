@@ -20,11 +20,12 @@ const globalWebPreferences = {
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width             : 800,
-    height            : 600,
-    frame             : false,
-    transparent       : true,
-    backgroundColor   : '#ffffff',
+    width       : 800,
+    height      : 600,
+    frame       : false,
+    transparent : true,
+
+    // backgroundColor   : '#ffffff',
     tabbingIdentifier : 'GW2 Goals',
     webPreferences    : {
       ...globalWebPreferences
@@ -49,7 +50,7 @@ function createNewItemWindow() {
     width          : 300,
     useContentSize : true,
     parent         : mainWindow,
-    modal          : true,
+    modal          : false,
     webPreferences : {
       ...globalWebPreferences
     }
@@ -71,12 +72,13 @@ function createOptionsWindow() {
     return console.warn('Options already open');
   }
   optionsWindow = new BrowserWindow({
-    height         : 250,
-    width          : 600,
+    height         : 245,
+    width          : 595,
     useContentSize : true,
     frame          : false,
     parent         : mainWindow,
-    resizable      : true,
+    transparent    : true,
+    resizable      : false,
     modal          : false,
     webPreferences : {
       ...globalWebPreferences
@@ -103,7 +105,8 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-  installExtension('ljjemllljcmogpfapbkkighbhhppjdbg');
+
+  // installExtension('ljjemllljcmogpfapbkkighbhhppjdbg');
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
